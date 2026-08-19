@@ -63,9 +63,34 @@ function isQueryValue(value: unknown): value is QueryValue {
 async function getErrorMessage(response: Response): Promise<string> {
   const payload: unknown = await response.json().catch(() => null);
   if (isApiErrorResponse(payload)) {
-    return payload.message;
+    return localizeApiMessage(payload.message);
   }
-  return "The request could not be completed.";
+  return "Não foi possível concluir a solicitação.";
+}
+
+export function localizeApiMessage(message: string): string {
+  const translations: Record<string, string> = {
+    "Authentication is required.": "Sua sessão expirou. Entre novamente.",
+    "Habit completion was not found.": "A conclusão do hábito não foi encontrada.",
+    "Habit completions must be within the last seven days.":
+      "As conclusões só podem ser alteradas entre hoje e os sete dias anteriores.",
+    "Habit is invalid.": "Os dados do hábito são inválidos.",
+    "Habit was not found.": "O hábito não foi encontrado.",
+    "Habit query is invalid.": "A consulta de hábitos é inválida.",
+    "Habit schedule is invalid.": "A agenda do hábito é inválida.",
+    "Habit schedule was not found.": "A agenda do hábito não foi encontrada.",
+    "Habit target count must be greater than zero.": "A meta do hábito precisa ser maior que zero.",
+    "Only active habits can be completed.": "Apenas hábitos ativos podem ser concluídos.",
+    "Only weekday schedules accept weekdays.": "Apenas agendas por dias da semana aceitam dias selecionados.",
+    "The completion is outside the schedule or exceeds its target.":
+      "A conclusão está fora da agenda ou já atingiu a meta do período.",
+    "Weekday schedules require at least one weekday.":
+      "Agendas por dias da semana exigem ao menos um dia selecionado.",
+    "Invalid credentials.": "Nome de usuário ou senha inválidos.",
+    "Username and password are required.": "Informe seu nome de usuário e senha.",
+  };
+
+  return translations[message] ?? "Não foi possível concluir a solicitação.";
 }
 
 function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
