@@ -231,6 +231,7 @@ export interface HabitCompletion {
 
 export interface HabitProgress {
   habitId: Id;
+  title: string;
   periodStart: BusinessDate;
   periodEnd: BusinessDate;
   completionCount: number;

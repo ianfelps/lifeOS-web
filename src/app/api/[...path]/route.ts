@@ -64,12 +64,16 @@ async function proxyRequest(request: NextRequest, context: RouteContext): Promis
 }
 
 async function copyResponse(response: Response): Promise<NextResponse> {
-  const body = await response.arrayBuffer();
   const headers = new Headers();
   const contentType = response.headers.get("content-type");
   if (contentType) {
     headers.set("Content-Type", contentType);
   }
+  if (response.status === 204 || response.status === 205 || response.status === 304) {
+    return new NextResponse(null, { status: response.status, headers });
+  }
+
+  const body = await response.arrayBuffer();
   return new NextResponse(body, { status: response.status, headers });
 }
 
