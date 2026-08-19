@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "LifeOS",
   description: "Personal organization for finances, habits, workouts, and goals.",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -15,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#208fc7",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
