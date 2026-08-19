@@ -1,12 +1,8 @@
 # LifeOS Web
 
-Frontend do LifeOS, uma aplicação pessoal para organizar finanças, hábitos, treinos,
-metas e gamificação. O projeto usa Next.js como interface e BFF para proteger a
-sessão, concentrando os fluxos diários em uma experiência responsiva, instalável e
-orientada a baixo atrito.
+Frontend do LifeOS, uma aplicação pessoal para organizar finanças, hábitos, treinos, metas e gamificação. O projeto usa Next.js como interface e BFF para proteger a sessão, concentrando os fluxos diários em uma experiência responsiva, instalável e orientada a baixo atrito.
 
-O sistema atende a um único proprietário provisionado pelo ambiente. Cadastro público,
-colaboração e multi-tenancy não fazem parte do escopo atual.
+O sistema atende a um único proprietário provisionado pelo ambiente. Cadastro público, colaboração e multi-tenancy não fazem parte do escopo atual.
 
 ## Módulos
 
@@ -44,8 +40,7 @@ public/                  Manifesto, ícone e artefatos públicos da PWA
 5. Em falhas de autenticação, os cookies são removidos e a área autenticada direciona ao login.
 6. A API continua sendo a fonte de verdade das regras de negócio e dos cálculos derivados.
 
-Essa separação evita expor tokens ao JavaScript do navegador, elimina dependência de
-CORS no cliente e preserva o frontend como consumidor de contratos HTTP bem definidos.
+Essa separação evita expor tokens ao JavaScript do navegador, elimina dependência de CORS no cliente e preserva o frontend como consumidor de contratos HTTP bem definidos.
 
 ## Decisões Técnicas
 
@@ -71,13 +66,11 @@ CORS no cliente e preserva o frontend como consumidor de contratos HTTP bem defi
 | Corrigir | Remove uma conclusão no histórico. | API reverte efeitos em até sete dias. |
 | Encerrar sessão | Usa a navegação autenticada | Cookies de sessão são removidos e o usuário volta ao login. |
 
-As regras completas de cada jornada estão em
-[`../lifeOS-api/docs/user-flows.md`](../lifeOS-api/docs/user-flows.md).
+As regras completas de cada jornada estão em [`../lifeOS-api/docs/user-flows.md`](../lifeOS-api/docs/user-flows.md).
 
 ## Integração com a API
 
-O frontend nunca chama a API pública diretamente no navegador. Todos os clientes usam
-o prefixo interno `/api`, encaminhado pelo BFF para `API_URL`.
+O frontend nunca chama a API pública diretamente no navegador. Todos os clientes usam o prefixo interno `/api`, encaminhado pelo BFF para `API_URL`.
 
 | Área | Cliente | Rotas internas principais |
 | --- | --- | --- |
@@ -88,14 +81,11 @@ o prefixo interno `/api`, encaminhado pelo BFF para `API_URL`.
 | Treinos | `src/lib/api/workouts.ts` | `/api/workouts/**` |
 | Gamificação | `src/lib/api/gamification.ts` | `/api/gamification/**` |
 
-Mensagens técnicas da API são localizadas no cliente antes de serem exibidas. Mensagens
-sem tradução específica usam uma resposta genérica em português para não expor detalhes
-internos do backend à interface.
+Mensagens técnicas da API são localizadas no cliente antes de serem exibidas. Mensagens sem tradução específica usam uma resposta genérica em português para não expor detalhes internos do backend à interface.
 
 ## PWA e Offline
 
-O projeto gera o service worker em builds de produção. Em desenvolvimento ele é
-intencionalmente desabilitado para evitar cache desatualizado durante a implementação.
+O projeto gera o service worker em builds de produção. Em desenvolvimento ele é intencionalmente desabilitado para evitar cache desatualizado durante a implementação.
 
 - Arquivos estáticos são pré-cacheados pelo Serwist.
 - Leituras `GET /api/**` usam `NetworkFirst` e podem usar dados recentes em cache.
@@ -103,10 +93,7 @@ intencionalmente desabilitado para evitar cache desatualizado durante a implemen
   enfileiradas offline.
 - A instalação exige uma origem HTTPS em produção.
 
-O manifesto atual define nome, modo `standalone`, cores e ícone SVG. Alguns navegadores,
-incluindo versões do Firefox para Android, podem criar apenas um atalho ou ignorar ícones
-SVG. Ícones PNG em múltiplas resoluções são necessários para a compatibilidade máxima de
-instalação.
+O manifesto atual define nome, modo `standalone`, cores e ícone SVG. Alguns navegadores, incluindo versões do Firefox para Android, podem criar apenas um atalho ou ignorar ícones SVG. Ícones PNG em múltiplas resoluções são necessários para a compatibilidade máxima de instalação.
 
 ## Requisitos Locais
 
@@ -149,8 +136,7 @@ Variável relevante:
 - O cache offline armazena apenas leituras recentes; operações de escrita nunca são
   executadas fora de conexão.
 
-Em produção, publique o frontend em HTTPS. Service workers e instalações PWA dependem de
-contexto seguro em navegadores comuns.
+Em produção, publique o frontend em HTTPS. Service workers e instalações PWA dependem de contexto seguro em navegadores comuns.
 
 ## Qualidade
 
@@ -162,9 +148,7 @@ npm run lint
 npm run build
 ```
 
-`npm run build` também valida tipos e gera o service worker de produção. O projeto ainda
-não possui uma suíte própria de testes de interface; validações de comportamento devem ser
-adicionadas junto de componentes com lógica isolada ou fluxos críticos.
+`npm run build` também valida tipos e gera o service worker de produção. O projeto ainda não possui uma suíte própria de testes de interface; validações de comportamento devem ser adicionadas junto de componentes com lógica isolada ou fluxos críticos.
 
 ## Documentação Relacionada
 
