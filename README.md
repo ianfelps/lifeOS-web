@@ -19,7 +19,7 @@ O sistema atende a um único proprietário criado pela rota de configuração in
 ## Arquitetura
 
 ```text
-Browser -> Next.js App Router + Client Components -> BFF /api/** -> ServiceLifeOS API
+Browser -> Next.js App Router + Client Components -> BFF /bff/** -> ServiceLifeOS API
 ```
 
 ```text
@@ -34,7 +34,7 @@ public/                  Manifesto, ícone e artefatos públicos da PWA
 ### Direção do fluxo
 
 1. A interface chama um cliente em `src/lib/api`.
-2. O cliente requisita apenas rotas internas em `/api/**`.
+2. O cliente requisita apenas rotas internas em `/bff/**`.
 3. O BFF lê tokens em cookies `HttpOnly` e encaminha a requisição à API.
 4. Se o access token expirar, o BFF tenta renovar a sessão uma vez com o refresh token.
 5. Em falhas de autenticação, os cookies são removidos e a área autenticada direciona ao login.
@@ -70,16 +70,16 @@ As regras completas de cada jornada estão em [`../lifeOS-api/docs/user-flows.md
 
 ## Integração com a API
 
-O frontend nunca chama a API pública diretamente no navegador. Todos os clientes usam o prefixo interno `/api`, encaminhado pelo BFF para `API_URL`.
+O frontend nunca chama a API pública diretamente no navegador. Todos os clientes usam o prefixo interno `/bff`, encaminhado pelo BFF para `API_URL`. O prefixo público `/api` permanece reservado ao proxy da API na VPS.
 
 | Área | Cliente | Rotas internas principais |
 | --- | --- | --- |
-| Autenticação | `src/lib/api/auth.ts` | `/api/auth/login`, `/api/auth/logout`, `/api/auth/me` |
-| Painel | `src/lib/api/dashboard.ts` | `/api/dashboard` |
-| Hábitos | `src/lib/api/habits.ts` | `/api/habits`, conclusões, progresso e histórico |
-| Finanças | `src/lib/api/finances.ts` | `/api/finances/**` |
-| Treinos | `src/lib/api/workouts.ts` | `/api/workouts/**` |
-| Gamificação | `src/lib/api/gamification.ts` | `/api/gamification/**` |
+| Autenticação | `src/lib/api/auth.ts` | `/bff/auth/login`, `/bff/auth/logout`, `/bff/auth/me` |
+| Painel | `src/lib/api/dashboard.ts` | `/bff/dashboard` |
+| Hábitos | `src/lib/api/habits.ts` | `/bff/habits`, conclusões, progresso e histórico |
+| Finanças | `src/lib/api/finances.ts` | `/bff/finances/**` |
+| Treinos | `src/lib/api/workouts.ts` | `/bff/workouts/**` |
+| Gamificação | `src/lib/api/gamification.ts` | `/bff/gamification/**` |
 
 Mensagens técnicas da API são localizadas no cliente antes de serem exibidas. Mensagens sem tradução específica usam uma resposta genérica em português para não expor detalhes internos do backend à interface.
 
@@ -88,7 +88,7 @@ Mensagens técnicas da API são localizadas no cliente antes de serem exibidas. 
 O projeto gera o service worker em builds de produção. Em desenvolvimento ele é intencionalmente desabilitado para evitar cache desatualizado durante a implementação.
 
 - Arquivos estáticos são pré-cacheados pelo Serwist.
-- Leituras `GET /api/**` usam `NetworkFirst` e podem usar dados recentes em cache.
+- Leituras `GET /bff/**` usam `NetworkFirst` e podem usar dados recentes em cache.
 - Escritas, como concluir um hábito ou registrar uma transação, exigem conexão e não são
   enfileiradas offline.
 - A instalação exige uma origem HTTPS em produção.

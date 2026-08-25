@@ -4,7 +4,7 @@
 
 O frontend executa em uma VPS Ubuntu ARM64. O GitHub Actions valida o projeto, publica uma imagem Docker ARM64 no GitHub Container Registry (GHCR) e atualiza o container por SSH. O Nginx encerra TLS em `https://lifeos.ianfelps.mywire.org` e encaminha a origem para o frontend em `127.0.0.1:3002`.
 
-O Nginx preserva o prefixo `/api/` para a API em `127.0.0.1:3001`. O BFF do Next.js alcança o container da API pela rede Docker privada, usando `http://api:8080`. A porta do frontend não é exposta publicamente.
+O Nginx preserva o prefixo `/api/` para a API em `127.0.0.1:3001`. O prefixo `/bff/` é encaminhado pela regra da origem ao Next.js, onde os tokens são mantidos em cookies `HttpOnly`. O BFF alcança o container da API pela rede Docker privada, usando `http://api:8080`. A porta do frontend não é exposta publicamente.
 
 ```text
 Browser -> Nginx -> 127.0.0.1:3002 -> Web:3000 -> API:8080

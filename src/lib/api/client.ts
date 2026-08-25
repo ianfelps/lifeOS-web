@@ -49,7 +49,7 @@ function createUrl(path: string, query?: object): string {
     }
   }
   const suffix = searchParams.size === 0 ? "" : `?${searchParams.toString()}`;
-  return `/api/${path.replace(/^\//, "")}${suffix}`;
+  return `/bff/${path.replace(/^\//, "")}${suffix}`;
 }
 
 function isQueryValue(value: unknown): value is QueryValue {
