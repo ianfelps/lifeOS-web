@@ -23,6 +23,7 @@
     "@types/react-dom": "^19.1.2",
     "eslint": "^9.25.0",
     "eslint-config-next": "^16.3.1",
+    "picomatch": "^4.0.7",
     "typescript": "^5.8.3"
   }
 }

@@ -23,7 +23,9 @@ Não use uma variável `NEXT_PUBLIC_*` para a API. Ela exporia a URL ao navegado
 
 ## GitHub Actions
 
-O deploy ocorre somente quando uma pull request interna de `development` para `main` é mesclada. O workflow executa `npm ci`, typecheck, lint e build antes de publicar `ghcr.io/OWNER/lifeos-web:COMMIT_SHA` para ARM64.
+O workflow `CI / test` executa `npm ci`, typecheck, lint e build em pull requests para `development` e `main`, além de pushes para `development`. Configure esse check como obrigatório nas regras de proteção dessas branches.
+
+O deploy ocorre somente quando uma pull request interna de `development` para `main` é mesclada. Ele repete as validações, publica `ghcr.io/OWNER/lifeos-web:COMMIT_SHA` para ARM64 e atualiza a VPS.
 
 Configure estes secrets no repositório do frontend:
 
