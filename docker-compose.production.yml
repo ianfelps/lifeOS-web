@@ -1,0 +1,15 @@
+services:
+  web:
+    image: ${APP_IMAGE:?APP_IMAGE must be set}
+    restart: unless-stopped
+    env_file:
+      - ${ENV_FILE:-.env.production}
+    ports:
+      - "127.0.0.1:3002:3000"
+    networks:
+      - api
+
+networks:
+  api:
+    external: true
+    name: ${API_NETWORK_NAME:-lifeos-api_default}
