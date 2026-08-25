@@ -2,7 +2,7 @@
 
 Frontend do LifeOS, uma aplicação pessoal para organizar finanças, hábitos, treinos, metas e gamificação. O projeto usa Next.js como interface e BFF para proteger a sessão, concentrando os fluxos diários em uma experiência responsiva, instalável e orientada a baixo atrito.
 
-O sistema atende a um único proprietário provisionado pelo ambiente. Cadastro público, colaboração e multi-tenancy não fazem parte do escopo atual.
+O sistema atende a um único proprietário criado pela rota de configuração inicial da API. Cadastro público, colaboração e multi-tenancy não fazem parte do escopo atual.
 
 ## Módulos
 
@@ -107,7 +107,7 @@ Não versione `.env.local`, URLs privadas, credenciais, tokens ou outros segredo
 ## Configuração
 
 1. Copie `.env.example` para `.env.local`.
-2. Defina `API_URL` com a URL base da API, sem barra final.
+2. Defina `API_URL` com a URL base da API, sem barra final. Para usar a API da VPS, utilize `https://lifeos.ianfelps.mywire.org/api`.
 3. Instale dependências:
 
 ```bash
@@ -124,7 +124,7 @@ Variável relevante:
 
 | Variável | Obrigatória | Descrição |
 | --- | --- | --- |
-| `API_URL` | Sim | URL pública ou local da API ServiceLifeOS, sem barra final. |
+| `API_URL` | Sim | URL pública ou local da API ServiceLifeOS, sem barra final. Em produção Docker, use `http://api:8080`. |
 
 ## Segurança e Operação
 
@@ -137,6 +137,23 @@ Variável relevante:
   executadas fora de conexão.
 
 Em produção, publique o frontend em HTTPS. Service workers e instalações PWA dependem de contexto seguro em navegadores comuns.
+
+## Produção
+
+O frontend é publicado em `https://lifeos.ianfelps.mywire.org/`. O Nginx encerra TLS e encaminha a origem para o container Next.js em `127.0.0.1:3002`; o prefixo `/api/` permanece encaminhado para a API em `127.0.0.1:3001`.
+
+```text
+Internet HTTPS -> Nginx -> /api/ -> 127.0.0.1:3001 -> API:8080
+                         -> /     -> 127.0.0.1:3002 -> Web:3000
+```
+
+O BFF do frontend usa `API_URL=http://api:8080` dentro da rede Docker externa `lifeos-api_default`. A URL não é exposta ao navegador e os tokens continuam somente em cookies `HttpOnly`.
+
+O deploy é disparado quando uma pull request interna de `development` para `main` é mesclada. O GitHub Actions instala dependências, valida tipos, lint e build, publica uma imagem ARM64 imutável no GHCR e a atualiza por SSH na VPS.
+
+Configure no repositório os secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_PORT`, `VPS_SSH_PRIVATE_KEY` e `VPS_SSH_KNOWN_HOSTS`. O `VPS_USER` deve ser o usuário restrito `lifeos-web-deploy`, com diretório `/opt/lifeos-web` e uma chave SSH exclusiva.
+
+Consulte [`docs/production.md`](docs/production.md) para o provisionamento da VPS, Nginx e diagnóstico.
 
 ## Qualidade
 
@@ -157,3 +174,4 @@ npm run build
 - [`../lifeOS-api/docs/user-flows.md`](../lifeOS-api/docs/user-flows.md): jornadas e integração por domínio.
 - [`../lifeOS-api/docs/habits.md`](../lifeOS-api/docs/habits.md): agendas, conclusões, ofensivas e correções.
 - [`../lifeOS-api/docs/production.md`](../lifeOS-api/docs/production.md): implantação e configuração operacional.
+- [`docs/production.md`](docs/production.md): implantação e configuração operacional do frontend.
