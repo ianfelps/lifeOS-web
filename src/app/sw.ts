@@ -14,9 +14,9 @@ const serwist = new Serwist({
   runtimeCaching: [
     ...defaultCache,
     {
-      matcher: ({ request, url }) => request.method === "GET" && url.pathname.startsWith("/api/"),
+      matcher: ({ request, url }) => request.method === "GET" && url.pathname.startsWith("/bff/"),
       handler: new NetworkFirst({
-        cacheName: "lifeos-api",
+        cacheName: "lifeos-bff",
         plugins: [
           new ExpirationPlugin({
             maxEntries: 100,
