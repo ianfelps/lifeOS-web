@@ -88,6 +88,16 @@ export function localizeApiMessage(message: string): string {
       "Agendas por dias da semana exigem ao menos um dia selecionado.",
     "Invalid credentials.": "Nome de usuário ou senha inválidos.",
     "Username and password are required.": "Informe seu nome de usuário e senha.",
+    "Budgets are only available for expense categories.":
+      "Orçamentos estão disponíveis apenas para categorias de despesa.",
+    "Category budget override was not found.": "A exceção mensal de orçamento não foi encontrada.",
+    "Ended recurrences cannot be edited.": "Recorrências encerradas não podem ser editadas.",
+    "Installments must be edited through their purchase.":
+      "Parcelas devem ser editadas pela compra parcelada.",
+    "The start month must be before the end month.":
+      "O mês inicial precisa ser anterior ao mês final.",
+    "The updated purchase cannot be less than its confirmed installments.":
+      "A compra atualizada não pode ser menor que suas parcelas confirmadas.",
   };
 
   return translations[message] ?? "Não foi possível concluir a solicitação.";

@@ -8,9 +8,10 @@ import { authApi } from "@/lib/api/auth";
 const navigationItems = [
   { href: "/dashboard", label: "Painel" },
   { href: "/habits", label: "Hábitos" },
+  { href: "/finances", label: "Finanças" },
 ];
 
-const futureItems = ["Finanças", "Treinos", "Metas", "Perfil"];
+const futureItems = ["Treinos", "Metas", "Perfil"];
 
 export function AppNavigation() {
   const pathname = usePathname();
