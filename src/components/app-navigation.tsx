@@ -10,9 +10,9 @@ const navigationItems = [
   { href: "/habits", label: "Hábitos" },
   { href: "/finances", label: "Finanças" },
   { href: "/workouts", label: "Treinos" },
+  { href: "/goals", label: "Metas" },
+  { href: "/profile", label: "Perfil" },
 ];
-
-const futureItems = ["Metas", "Perfil"];
 
 export function AppNavigation() {
   const pathname = usePathname();
@@ -46,11 +46,6 @@ export function AppNavigation() {
             >
               {item.label}
             </Link>
-          ))}
-          {futureItems.map((item) => (
-            <span className="app-nav-link unavailable" key={item} title="Em breve">
-              {item}
-            </span>
           ))}
         </nav>
         <button className="app-nav-logout" disabled={isLoggingOut} onClick={logout} type="button">

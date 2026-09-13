@@ -78,6 +78,11 @@ export interface User {
   displayName: string;
 }
 
+export interface UpdateUserIdentityRequest {
+  userName: string;
+  displayName: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

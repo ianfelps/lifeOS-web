@@ -14,7 +14,7 @@ O sistema atende a um único proprietário criado pela rota de configuração in
 | Finanças | Em breve | Lançamentos, categorias, orçamentos, recorrências e relatórios. |
 | Treinos | Disponível | Exercícios, fichas, sessões e progressão. |
 | Metas | Em breve | Metas pessoais e automáticas, XP, badges e progressão. |
-| Perfil | Em breve | Preferências, senha e gerenciamento de sessões. |
+| Perfil | Disponível | Identidade, evolução, conquistas, gamificação, preferências e segurança. |
 
 ## Arquitetura
 
@@ -80,6 +80,7 @@ O frontend nunca chama a API pública diretamente no navegador. Todos os cliente
 | Finanças | `src/lib/api/finances.ts` | `/bff/finances/**` |
 | Treinos | `src/lib/api/workouts.ts` | `/bff/workouts/**` |
 | Gamificação | `src/lib/api/gamification.ts` | `/bff/gamification/**` |
+| Perfil | `src/lib/api/users.ts` | `/bff/users/me/**` |
 
 Mensagens técnicas da API são localizadas no cliente antes de serem exibidas. Mensagens sem tradução específica usam uma resposta genérica em português para não expor detalhes internos do backend à interface.
 

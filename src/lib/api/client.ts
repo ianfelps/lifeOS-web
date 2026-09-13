@@ -116,6 +116,32 @@ export function localizeApiMessage(message: string): string {
     "Exercise muscle groups are invalid.": "Os grupos musculares do exercício são inválidos.",
     "Workout sheet muscle groups are invalid.": "Os grupos musculares da ficha são inválidos.",
     "Workout sheet was not found.": "A ficha não foi encontrada.",
+    "Cancelled goals cannot be updated.": "Metas canceladas não podem ser atualizadas.",
+    "Exercise source was not found.": "O exercício vinculado não foi encontrado.",
+    "Goal is invalid.": "Os dados da meta são inválidos.",
+    "Goal progress cannot be negative.": "O progresso da meta não pode ser negativo.",
+    "Goal sources are invalid for its type.": "As fontes da meta não são válidas para esse tipo.",
+    "Goal type cannot be changed.": "O tipo da meta não pode ser alterado.",
+    "Goal was not found.": "A meta não foi encontrada.",
+    "Habit source was not found.": "O hábito vinculado não foi encontrado.",
+    "Only free-form goals accept manual progress.": "Apenas metas livres aceitam progresso manual.",
+    "Pagination is invalid.": "A paginação informada é inválida.",
+    "Workout sheet source was not found.": "A ficha vinculada não foi encontrada.",
+    "Badge is invalid.": "Os dados da conquista são inválidos.",
+    "Badge was not found.": "A conquista não foi encontrada.",
+    "Current password is invalid.": "A senha atual está incorreta.",
+    "Password is invalid.": "A nova senha não atende aos requisitos de segurança.",
+    "Password must meet the minimum length requirement.":
+      "A nova senha não atende ao tamanho mínimo exigido.",
+    "User preference is invalid.": "A preferência de unidade informada é inválida.",
+    "User preference was not found.": "A preferência de unidade não foi encontrada.",
+    "User name and display name are required.":
+      "Informe o nome de usuário e o nome de exibição.",
+    "User name or display name is too long.":
+      "O nome de usuário ou o nome de exibição é muito longo.",
+    "User name is already in use.": "Este nome de usuário já está em uso.",
+    "XP rules are invalid.": "As regras de XP informadas são inválidas.",
+    "Level progression is invalid.": "A progressão de níveis informada é inválida.",
   };
 
   return translations[message] ?? "Não foi possível concluir a solicitação.";
