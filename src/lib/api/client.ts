@@ -98,6 +98,24 @@ export function localizeApiMessage(message: string): string {
       "O mês inicial precisa ser anterior ao mês final.",
     "The updated purchase cannot be less than its confirmed installments.":
       "A compra atualizada não pode ser menor que suas parcelas confirmadas.",
+    "A workout session must use either a sheet or exercises.":
+      "Um treino deve usar uma ficha ou conter exercícios.",
+    "Archived exercises cannot be used in workout sheets.":
+      "Exercícios arquivados não podem ser usados em fichas.",
+    "Archived workout sheets cannot be used.": "Fichas arquivadas não podem iniciar treinos.",
+    "Cancelled workout sessions cannot be edited.":
+      "Treinos cancelados não podem ser editados.",
+    "Exercise was not found.": "O exercício não foi encontrado.",
+    "Only draft workout sessions can be completed.":
+      "Apenas treinos em andamento podem ser concluídos.",
+    "Workout session exercises are invalid.": "Os exercícios do treino são inválidos.",
+    "Workout sessions require at least one exercise.":
+      "O treino precisa de pelo menos um exercício.",
+    "Workout session sets are invalid.": "As séries do treino são inválidas.",
+    "Workout sheet exercises are invalid.": "Os exercícios da ficha são inválidos.",
+    "Exercise muscle groups are invalid.": "Os grupos musculares do exercício são inválidos.",
+    "Workout sheet muscle groups are invalid.": "Os grupos musculares da ficha são inválidos.",
+    "Workout sheet was not found.": "A ficha não foi encontrada.",
   };
 
   return translations[message] ?? "Não foi possível concluir a solicitação.";

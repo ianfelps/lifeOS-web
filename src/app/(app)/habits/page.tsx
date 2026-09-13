@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { Check } from "pixelarticons/react/Check";
 import { Pencil } from "pixelarticons/react/Pencil";
 import { Waves } from "pixelarticons/react/Waves";
+import {
+  ConfirmationModal,
+  type Confirmation,
+} from "@/components/confirmation-modal";
 import type {
   Habit,
   HabitCompletion,
@@ -42,7 +46,9 @@ const weekdays: Array<{ value: Weekday; label: string }> = [
 
 export default function HabitsPage() {
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [progressByHabitId, setProgressByHabitId] = useState<Record<string, HabitProgress>>({});
+  const [progressByHabitId, setProgressByHabitId] = useState<
+    Record<string, HabitProgress>
+  >({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -53,11 +59,16 @@ export default function HabitsPage() {
   const [historyHabit, setHistoryHabit] = useState<Habit | null>(null);
   const [history, setHistory] = useState<HabitCompletion[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   async function loadHabits() {
     try {
       setError(null);
-      const response = await habitsApi.getAll({ includeArchived: false, page: 1, pageSize: 50 });
+      const response = await habitsApi.getAll({
+        includeArchived: false,
+        page: 1,
+        pageSize: 50,
+      });
       const today = getSaoPauloDate();
       const progress = await Promise.all(
         response.items.map((habit) => habitsApi.getProgress(habit.id, today)),
@@ -73,11 +84,17 @@ export default function HabitsPage() {
 
   useEffect(() => {
     const controller = new AbortController();
-    void habitsApi.getAll({ includeArchived: false, page: 1, pageSize: 50 }, controller.signal)
+    void habitsApi
+      .getAll(
+        { includeArchived: false, page: 1, pageSize: 50 },
+        controller.signal,
+      )
       .then(async (response) => {
         const today = getSaoPauloDate();
         const progress = await Promise.all(
-          response.items.map((habit) => habitsApi.getProgress(habit.id, today, controller.signal)),
+          response.items.map((habit) =>
+            habitsApi.getProgress(habit.id, today, controller.signal),
+          ),
         );
         if (controller.signal.aborted) {
           return;
@@ -126,7 +143,11 @@ export default function HabitsPage() {
       setError("Selecione pelo menos um dia da semana.");
       return;
     }
-    if ((editor.scheduleType === "WeeklyCount" || editor.scheduleType === "DailyCount") && editor.targetCount < 1) {
+    if (
+      (editor.scheduleType === "WeeklyCount" ||
+        editor.scheduleType === "DailyCount") &&
+      editor.targetCount < 1
+    ) {
       setError("A meta precisa ser maior que zero.");
       return;
     }
@@ -136,11 +157,14 @@ export default function HabitsPage() {
     const request = {
       priority: editor.priority,
       schedule: {
-        targetCount: editor.scheduleType === "WeeklyCount" || editor.scheduleType === "DailyCount"
-          ? editor.targetCount
-          : undefined,
+        targetCount:
+          editor.scheduleType === "WeeklyCount" ||
+          editor.scheduleType === "DailyCount"
+            ? editor.targetCount
+            : undefined,
         type: editor.scheduleType,
-        weekdays: editor.scheduleType === "Weekdays" ? editor.weekdays : undefined,
+        weekdays:
+          editor.scheduleType === "Weekdays" ? editor.weekdays : undefined,
       },
       title,
     };
@@ -191,10 +215,6 @@ export default function HabitsPage() {
   }
 
   async function archiveHabit(habit: Habit) {
-    if (!window.confirm(`Arquivar o hábito “${habit.title}”? O histórico será preservado.`)) {
-      return;
-    }
-
     setProcessingId(habit.id);
     setError(null);
     try {
@@ -223,7 +243,11 @@ export default function HabitsPage() {
     setError(null);
     try {
       const dates = getRecentDates();
-      const completions = await habitsApi.getCompletions(habit.id, dates.at(-1) ?? dates[0], dates[0]);
+      const completions = await habitsApi.getCompletions(
+        habit.id,
+        dates.at(-1) ?? dates[0],
+        dates[0],
+      );
       setHistory(completions);
     } catch (historyError) {
       setError(getErrorMessage(historyError));
@@ -277,7 +301,11 @@ export default function HabitsPage() {
             <h1 id="habits-title">Hábitos</h1>
             <span>Pequenas ações, progresso visível.</span>
           </div>
-          <button className="habits-create" onClick={openCreateEditor} type="button">
+          <button
+            className="habits-create"
+            onClick={openCreateEditor}
+            type="button"
+          >
             <span aria-hidden="true">+</span>
             Novo hábito
           </button>
@@ -286,18 +314,28 @@ export default function HabitsPage() {
         {error ? (
           <div className="habits-error" role="alert">
             <span>{error}</span>
-            <button onClick={() => void loadHabits()} type="button">Tentar novamente</button>
+            <button onClick={() => void loadHabits()} type="button">
+              Tentar novamente
+            </button>
           </div>
         ) : null}
 
         {isLoading ? (
-          <div className="habits-loading" aria-live="polite">CARREGANDO HÁBITOS</div>
+          <div className="habits-loading" aria-live="polite">
+            CARREGANDO HÁBITOS
+          </div>
         ) : habits.length === 0 ? (
           <section className="habits-empty">
             <Waves aria-hidden="true" />
             <h2>Seu primeiro hábito começa aqui.</h2>
             <p>Crie uma rotina que vale a pena repetir.</p>
-            <button className="habits-create" onClick={openCreateEditor} type="button">Criar hábito</button>
+            <button
+              className="habits-create"
+              onClick={openCreateEditor}
+              type="button"
+            >
+              Criar hábito
+            </button>
           </section>
         ) : (
           <section className="habits-list" aria-label="Lista de hábitos">
@@ -305,13 +343,21 @@ export default function HabitsPage() {
               const progress = progressByHabitId[habit.id];
               const isPaused = habit.status === "Paused";
               const progressPercent = progress
-                ? Math.min(100, (progress.completionCount / progress.targetCount) * 100)
+                ? Math.min(
+                    100,
+                    (progress.completionCount / progress.targetCount) * 100,
+                  )
                 : 0;
 
               return (
-                <article className={isPaused ? "habit-card paused" : "habit-card"} key={habit.id}>
+                <article
+                  className={isPaused ? "habit-card paused" : "habit-card"}
+                  key={habit.id}
+                >
                   <div className="habit-card-topline">
-                    <span className={`priority priority-${habit.priority.toLowerCase()}`}>
+                    <span
+                      className={`priority priority-${habit.priority.toLowerCase()}`}
+                    >
                       {getPriorityLabel(habit.priority)}
                     </span>
                     <span>{getScheduleLabel(habit)}</span>
@@ -319,13 +365,21 @@ export default function HabitsPage() {
                   <div className="habit-card-content">
                     <div>
                       <h2>{habit.title}</h2>
-                      <p>{isPaused ? "Pausado" : `${progress?.streak ?? 0} de ofensiva`}</p>
+                      <p>
+                        {isPaused
+                          ? "Pausado"
+                          : `${progress?.streak ?? 0} de ofensiva`}
+                      </p>
                     </div>
-                    <div className="habit-progress" aria-label={`${progressPercent}% concluído`}>
+                    <div
+                      className="habit-progress"
+                      aria-label={`${progressPercent}% concluído`}
+                    >
                       <span style={{ width: `${progressPercent}%` }} />
                     </div>
                     <span className="habit-count">
-                      {progress?.completionCount ?? 0} / {progress?.targetCount ?? habit.schedule.targetCount}
+                      {progress?.completionCount ?? 0} /{" "}
+                      {progress?.targetCount ?? habit.schedule.targetCount}
                     </span>
                   </div>
                   <div className="habit-card-actions">
@@ -340,12 +394,33 @@ export default function HabitsPage() {
                         Concluir
                       </button>
                     ) : null}
-                    <button onClick={() => void openHistory(habit)} type="button">Histórico</button>
-                    <button onClick={() => openEditEditor(habit)} type="button">Editar</button>
-                    <button onClick={() => void changeStatus(habit)} type="button">
+                    <button
+                      onClick={() => void openHistory(habit)}
+                      type="button"
+                    >
+                      Histórico
+                    </button>
+                    <button onClick={() => openEditEditor(habit)} type="button">
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => void changeStatus(habit)}
+                      type="button"
+                    >
                       {isPaused ? "Retomar" : "Pausar"}
                     </button>
-                    <button className="archive-action" onClick={() => void archiveHabit(habit)} type="button">
+                    <button
+                      className="archive-action"
+                      onClick={() =>
+                        setConfirmation({
+                          confirmLabel: "Arquivar hábito",
+                          description: `O histórico do hábito “${habit.title}” será preservado.`,
+                          onConfirm: () => archiveHabit(habit),
+                          title: "Arquivar hábito?",
+                        })
+                      }
+                      type="button"
+                    >
                       Arquivar
                     </button>
                   </div>
@@ -378,6 +453,12 @@ export default function HabitsPage() {
           onDelete={(completion) => void deleteHistoryCompletion(completion)}
         />
       ) : null}
+      {confirmation ? (
+        <ConfirmationModal
+          confirmation={confirmation}
+          onCancel={() => setConfirmation(null)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -406,27 +487,38 @@ function HabitEditor({
 
   return (
     <div className="habit-modal-backdrop" role="presentation">
-      <section className="habit-modal" aria-labelledby="habit-editor-title" role="dialog" aria-modal="true">
+      <section
+        className="habit-modal"
+        aria-labelledby="habit-editor-title"
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="habit-modal-header">
           <span id="habit-editor-title">{title.toUpperCase()}</span>
-          <button aria-label="Fechar" onClick={onCancel} type="button">×</button>
+          <button aria-label="Fechar" onClick={onCancel} type="button">
+            ×
+          </button>
         </div>
         <div className="habit-modal-content">
           <label className="habit-field">
             <span>Título</span>
             <input
               autoFocus
-              onChange={(event) => onChange({ ...editor, title: event.target.value })}
+              onChange={(event) =>
+                onChange({ ...editor, title: event.target.value })
+              }
               value={editor.title}
             />
           </label>
           <label className="habit-field">
             <span>Prioridade</span>
             <select
-              onChange={(event) => onChange({
-                ...editor,
-                priority: event.target.value as HabitPriority,
-              })}
+              onChange={(event) =>
+                onChange({
+                  ...editor,
+                  priority: event.target.value as HabitPriority,
+                })
+              }
               value={editor.priority}
             >
               <option value="Low">Baixa</option>
@@ -446,21 +538,31 @@ function HabitEditor({
               </button>
               <button
                 className={editor.scheduleType === "Weekdays" ? "selected" : ""}
-                onClick={() => onChange({ ...editor, scheduleType: "Weekdays" })}
+                onClick={() =>
+                  onChange({ ...editor, scheduleType: "Weekdays" })
+                }
                 type="button"
               >
                 Dias da semana
               </button>
               <button
-                className={editor.scheduleType === "WeeklyCount" ? "selected" : ""}
-                onClick={() => onChange({ ...editor, scheduleType: "WeeklyCount" })}
+                className={
+                  editor.scheduleType === "WeeklyCount" ? "selected" : ""
+                }
+                onClick={() =>
+                  onChange({ ...editor, scheduleType: "WeeklyCount" })
+                }
                 type="button"
               >
                 Meta semanal
               </button>
               <button
-                className={editor.scheduleType === "DailyCount" ? "selected" : ""}
-                onClick={() => onChange({ ...editor, scheduleType: "DailyCount" })}
+                className={
+                  editor.scheduleType === "DailyCount" ? "selected" : ""
+                }
+                onClick={() =>
+                  onChange({ ...editor, scheduleType: "DailyCount" })
+                }
                 type="button"
               >
                 Meta diária
@@ -471,7 +573,9 @@ function HabitEditor({
             <div className="weekday-picker" aria-label="Dias da semana">
               {weekdays.map((day) => (
                 <button
-                  className={editor.weekdays.includes(day.value) ? "selected" : ""}
+                  className={
+                    editor.weekdays.includes(day.value) ? "selected" : ""
+                  }
                   key={day.value}
                   onClick={() => toggleWeekday(day.value)}
                   title={getWeekdayLabel(day.value)}
@@ -482,23 +586,33 @@ function HabitEditor({
               ))}
             </div>
           ) : null}
-          {editor.scheduleType === "WeeklyCount" || editor.scheduleType === "DailyCount" ? (
+          {editor.scheduleType === "WeeklyCount" ||
+          editor.scheduleType === "DailyCount" ? (
             <label className="habit-field compact-field">
               <span>Conclusões necessárias</span>
               <input
                 min="1"
-                onChange={(event) => onChange({
-                  ...editor,
-                  targetCount: Number(event.target.value),
-                })}
+                onChange={(event) =>
+                  onChange({
+                    ...editor,
+                    targetCount: Number(event.target.value),
+                  })
+                }
                 type="number"
                 value={editor.targetCount}
               />
             </label>
           ) : null}
           <div className="habit-modal-actions">
-            <button onClick={onCancel} type="button">Cancelar</button>
-            <button className="primary" disabled={isSaving} onClick={onSave} type="button">
+            <button onClick={onCancel} type="button">
+              Cancelar
+            </button>
+            <button
+              className="primary"
+              disabled={isSaving}
+              onClick={onSave}
+              type="button"
+            >
               {isSaving ? "Salvando..." : "Salvar hábito"}
             </button>
           </div>
@@ -527,54 +641,69 @@ function HabitHistory({
 }>) {
   return (
     <div className="habit-modal-backdrop" role="presentation">
-      <section className="habit-modal history-modal" aria-labelledby="history-title" role="dialog" aria-modal="true">
+      <section
+        className="habit-modal history-modal"
+        aria-labelledby="history-title"
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="habit-modal-header">
           <span id="history-title">HISTÓRICO</span>
-          <button aria-label="Fechar" onClick={onClose} type="button">×</button>
+          <button aria-label="Fechar" onClick={onClose} type="button">
+            ×
+          </button>
         </div>
         <div className="habit-modal-content">
           <div className="history-intro">
             <Pencil aria-hidden="true" />
             <div>
               <strong>{habit.title}</strong>
-              <span>Correções disponíveis para hoje e os sete dias anteriores.</span>
+              <span>
+                Correções disponíveis para hoje e os sete dias anteriores.
+              </span>
             </div>
           </div>
-          {isLoading ? <p className="history-loading">CARREGANDO HISTÓRICO</p> : (
+          {isLoading ? (
+            <p className="history-loading">CARREGANDO HISTÓRICO</p>
+          ) : (
             <ul className="history-list">
-              {getRecentDates().filter((date) => isScheduledOn(habit, date)).map((date) => {
-                const entries = completions.filter((completion) => completion.completedOn === date);
-                const isProcessing = processingId === `${habit.id}:${date}`;
+              {getRecentDates()
+                .filter((date) => isScheduledOn(habit, date))
+                .map((date) => {
+                  const entries = completions.filter(
+                    (completion) => completion.completedOn === date,
+                  );
+                  const isProcessing = processingId === `${habit.id}:${date}`;
 
-                return (
-                  <li key={date}>
-                    <span>{formatHistoryDate(date)}</span>
-                    <div>
-                      {entries.map((entry) => (
+                  return (
+                    <li key={date}>
+                      <span>{formatHistoryDate(date)}</span>
+                      <div>
+                        {entries.map((entry) => (
+                          <button
+                            className="history-completion"
+                            disabled={processingId === entry.id}
+                            key={entry.id}
+                            onClick={() => onDelete(entry)}
+                            title="Remover conclusão"
+                            type="button"
+                          >
+                            <Check aria-hidden="true" />
+                          </button>
+                        ))}
                         <button
-                          className="history-completion"
-                          disabled={processingId === entry.id}
-                          key={entry.id}
-                          onClick={() => onDelete(entry)}
-                          title="Remover conclusão"
+                          className="history-add"
+                          disabled={isProcessing}
+                          onClick={() => onCreate(date)}
+                          title="Registrar conclusão"
                           type="button"
                         >
-                          <Check aria-hidden="true" />
+                          +
                         </button>
-                      ))}
-                      <button
-                        className="history-add"
-                        disabled={isProcessing}
-                        onClick={() => onCreate(date)}
-                        title="Registrar conclusão"
-                        type="button"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
+                      </div>
+                    </li>
+                  );
+                })}
             </ul>
           )}
         </div>
@@ -583,7 +712,9 @@ function HabitHistory({
   );
 }
 
-function toProgressMap(progresses: HabitProgress[]): Record<string, HabitProgress> {
+function toProgressMap(
+  progresses: HabitProgress[],
+): Record<string, HabitProgress> {
   const result: Record<string, HabitProgress> = {};
   for (const progress of progresses) {
     result[progress.habitId] = progress;
@@ -598,7 +729,8 @@ function getSaoPauloDate(): string {
     timeZone: "America/Sao_Paulo",
     year: "numeric",
   }).formatToParts();
-  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)?.value ?? "";
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((item) => item.type === type)?.value ?? "";
 
   return `${part("year")}-${part("month")}-${part("day")}`;
 }
@@ -628,7 +760,8 @@ function getPriorityLabel(priority: HabitPriority): string {
 function getScheduleLabel(habit: Habit): string {
   if (habit.schedule.type === "Daily") return "Diária";
   if (habit.schedule.type === "Weekdays") return "Dias específicos";
-  if (habit.schedule.type === "WeeklyCount") return `${habit.schedule.targetCount}x por semana`;
+  if (habit.schedule.type === "WeeklyCount")
+    return `${habit.schedule.targetCount}x por semana`;
   return `${habit.schedule.targetCount}x por dia`;
 }
 
@@ -664,5 +797,7 @@ function isScheduledOn(habit: Habit, date: string): boolean {
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Não foi possível concluir esta ação.";
+  return error instanceof Error
+    ? error.message
+    : "Não foi possível concluir esta ação.";
 }
