@@ -9,9 +9,10 @@ const navigationItems = [
   { href: "/dashboard", label: "Painel" },
   { href: "/habits", label: "Hábitos" },
   { href: "/finances", label: "Finanças" },
+  { href: "/workouts", label: "Treinos" },
 ];
 
-const futureItems = ["Treinos", "Metas", "Perfil"];
+const futureItems = ["Metas", "Perfil"];
 
 export function AppNavigation() {
   const pathname = usePathname();

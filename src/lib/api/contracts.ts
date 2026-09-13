@@ -18,6 +18,19 @@ export type Weekday =
   | "Friday"
   | "Saturday";
 export type WeightUnit = "Kilograms" | "Pounds";
+export type MuscleGroup =
+  | "Other"
+  | "Chest"
+  | "Back"
+  | "Shoulders"
+  | "Biceps"
+  | "Triceps"
+  | "Forearms"
+  | "Quadriceps"
+  | "Hamstrings"
+  | "Glutes"
+  | "Calves"
+  | "Abdomen";
 export type WorkoutSessionStatus = "Draft" | "Completed" | "Cancelled";
 export type GoalType = "Financial" | "Habit" | "Training" | "FreeForm";
 export type GoalStatus = "Active" | "Completed" | "Cancelled";
@@ -249,6 +262,8 @@ export interface HabitReminder {
 
 export interface ExerciseRequest {
   name: string;
+  primaryMuscleGroup: MuscleGroup;
+  secondaryMuscleGroup?: MuscleGroup | null;
 }
 
 export interface Exercise extends ExerciseRequest {
@@ -267,6 +282,7 @@ export interface WorkoutSheetExerciseRequest {
 
 export interface WorkoutSheetRequest {
   name: string;
+  muscleGroups: MuscleGroup[];
   exercises: WorkoutSheetExerciseRequest[];
 }
 
@@ -287,6 +303,7 @@ export interface WorkoutSheet {
   id: Id;
   name: string;
   archived: boolean;
+  muscleGroups: MuscleGroup[];
   exercises: WorkoutSheetExercise[];
 }
 

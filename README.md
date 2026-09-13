@@ -12,7 +12,7 @@ O sistema atende a um único proprietário criado pela rota de configuração in
 | Painel | Disponível | Resumo financeiro, hábitos pendentes, treinos recentes e gamificação. |
 | Hábitos | Disponível | Criação, edição, pausa, retomada, arquivamento, conclusões e correções de histórico. |
 | Finanças | Em breve | Lançamentos, categorias, orçamentos, recorrências e relatórios. |
-| Treinos | Em breve | Exercícios, fichas, sessões e progressão. |
+| Treinos | Disponível | Exercícios, fichas, sessões e progressão. |
 | Metas | Em breve | Metas pessoais e automáticas, XP, badges e progressão. |
 | Perfil | Em breve | Preferências, senha e gerenciamento de sessões. |
 
