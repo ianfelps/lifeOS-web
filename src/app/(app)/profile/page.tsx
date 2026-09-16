@@ -51,6 +51,7 @@ type BadgeResources = {
 };
 
 const ledgerPageSize = 10;
+const badgePageSize = 10;
 
 const criterionTypes: Array<{ label: string; value: BadgeCriterionType }> = [
   { label: "XP acumulado", value: "Xp" },
@@ -91,6 +92,8 @@ export default function ProfilePage() {
   const [xpRules, setXpRules] = useState<XpRule[]>([]);
   const [progression, setProgression] = useState<LevelProgressionRule | null>(null);
   const [badges, setBadges] = useState<Badge[]>([]);
+  const [badgeTotal, setBadgeTotal] = useState(0);
+  const [badgePage, setBadgePage] = useState(1);
   const [ledger, setLedger] = useState<XpLedgerEntry[]>([]);
   const [ledgerTotal, setLedgerTotal] = useState(0);
   const [ledgerPage, setLedgerPage] = useState(1);
@@ -110,6 +113,7 @@ export default function ProfilePage() {
   const [badgeResources, setBadgeResources] = useState<BadgeResources | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const ledgerPageCount = Math.max(1, Math.ceil(ledgerTotal / ledgerPageSize));
+  const badgePageCount = Math.max(1, Math.ceil(badgeTotal / badgePageSize));
 
   async function loadProfile(signal?: AbortSignal) {
     try {
@@ -120,7 +124,10 @@ export default function ProfilePage() {
           gamificationApi.getProfile(signal),
           gamificationApi.getXpRules(signal),
           gamificationApi.getLevelProgression(signal),
-          gamificationApi.getBadges(includeArchivedBadges, signal),
+          gamificationApi.getBadges(
+            { includeArchived: includeArchivedBadges, page: badgePage, pageSize: badgePageSize },
+            signal,
+          ),
           gamificationApi.getLedger(
             {
               eventType: ledgerEvent === "All" ? undefined : ledgerEvent,
@@ -138,7 +145,8 @@ export default function ProfilePage() {
       setProfile(nextProfile);
       setXpRules(nextXpRules);
       setProgression(nextProgression);
-      setBadges(nextBadges);
+      setBadges(nextBadges.items);
+      setBadgeTotal(nextBadges.totalCount);
       setLedger(nextLedger.items);
       setLedgerTotal(nextLedger.totalCount);
       setError(null);
@@ -157,7 +165,10 @@ export default function ProfilePage() {
       gamificationApi.getProfile(controller.signal),
       gamificationApi.getXpRules(controller.signal),
       gamificationApi.getLevelProgression(controller.signal),
-      gamificationApi.getBadges(includeArchivedBadges, controller.signal),
+      gamificationApi.getBadges(
+        { includeArchived: includeArchivedBadges, page: badgePage, pageSize: badgePageSize },
+        controller.signal,
+      ),
       gamificationApi.getLedger(
         {
           eventType: ledgerEvent === "All" ? undefined : ledgerEvent,
@@ -176,7 +187,8 @@ export default function ProfilePage() {
         setProfile(nextProfile);
         setXpRules(nextXpRules);
         setProgression(nextProgression);
-        setBadges(nextBadges);
+       setBadges(nextBadges.items);
+       setBadgeTotal(nextBadges.totalCount);
         setLedger(nextLedger.items);
         setLedgerTotal(nextLedger.totalCount);
         setError(null);
@@ -188,7 +200,7 @@ export default function ProfilePage() {
         if (!controller.signal.aborted) setIsLoading(false);
       });
     return () => controller.abort();
-  }, [includeArchivedBadges, ledgerEvent, ledgerFrom, ledgerPage, ledgerTo]);
+  }, [badgePage, includeArchivedBadges, ledgerEvent, ledgerFrom, ledgerPage, ledgerTo]);
 
   async function updatePreference(preferredWeightUnit: UserPreference["preferredWeightUnit"]) {
     setProcessing("preference");
@@ -358,10 +370,11 @@ export default function ProfilePage() {
       setBadgeEditor(null);
       setEditingBadge(null);
       const [nextBadges, nextProfile] = await Promise.all([
-        gamificationApi.getBadges(includeArchivedBadges),
+        gamificationApi.getBadges({ includeArchived: includeArchivedBadges, page: badgePage, pageSize: badgePageSize }),
         gamificationApi.getProfile(),
       ]);
-      setBadges(nextBadges);
+      setBadges(nextBadges.items);
+      setBadgeTotal(nextBadges.totalCount);
       setProfile(nextProfile);
       setNotice(editingBadge ? "A conquista foi atualizada." : "A conquista foi criada.");
     } catch (saveError) {
@@ -378,10 +391,15 @@ export default function ProfilePage() {
     try {
       await gamificationApi.archiveBadge(badge.id);
       const [nextBadges, nextProfile] = await Promise.all([
-        gamificationApi.getBadges(includeArchivedBadges),
+        gamificationApi.getBadges({ includeArchived: includeArchivedBadges, page: badgePage, pageSize: badgePageSize }),
         gamificationApi.getProfile(),
       ]);
-      setBadges(nextBadges);
+      if (nextBadges.items.length === 0 && badgePage > 1) {
+        setBadgePage(badgePage - 1);
+      } else {
+        setBadges(nextBadges.items);
+        setBadgeTotal(nextBadges.totalCount);
+      }
       setProfile(nextProfile);
       setNotice("A conquista foi arquivada.");
     } catch (archiveError) {
@@ -527,9 +545,14 @@ export default function ProfilePage() {
             </article>
           </div>
           <div className="profile-subsection-heading profile-catalog-heading"><div><h3>Catálogo de conquistas</h3><span>Crie critérios para desbloqueios automáticos.</span></div><button className="profile-primary-button" onClick={() => void openBadgeEditor()} type="button">Nova conquista</button></div>
-          <label className="profile-archive-toggle"><input checked={includeArchivedBadges} onChange={(event) => setIncludeArchivedBadges(event.target.checked)} type="checkbox" /><span>Incluir arquivadas</span></label>
+          <label className="profile-archive-toggle"><input checked={includeArchivedBadges} onChange={(event) => { setBadgePage(1); setIncludeArchivedBadges(event.target.checked); }} type="checkbox" /><span>Incluir arquivadas</span></label>
           <div className="profile-catalog-list">
             {badges.map((badge) => <article className={badge.archived ? "archived" : ""} key={badge.id}><div><strong>{badge.name}</strong><p>{badge.description}</p><span>{badge.criteria.length} {badge.criteria.length === 1 ? "critério" : "critérios"}{badge.unlockedAt ? ` · desbloqueada em ${formatDateTime(badge.unlockedAt)}` : ""}</span></div><div><button disabled={badge.archived} onClick={() => void openBadgeEditor(badge)} type="button">Editar</button>{!badge.archived ? <button className="danger" disabled={processing === badge.id} onClick={() => setConfirmation({ confirmLabel: "Arquivar", description: `A conquista “${badge.name}” não ficará mais disponível para novos desbloqueios.`, onConfirm: () => archiveBadge(badge), title: "Arquivar conquista" })} type="button">Arquivar</button> : null}</div></article>)}
+          </div>
+          <div className="profile-pagination">
+            <button disabled={badgePage === 1} onClick={() => setBadgePage(badgePage - 1)} type="button">Anterior</button>
+            <span>Página {badgePage} de {badgePageCount}</span>
+            <button disabled={badgePage === badgePageCount} onClick={() => setBadgePage(badgePage + 1)} type="button">Próxima</button>
           </div>
         </section>
 

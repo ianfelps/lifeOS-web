@@ -3,6 +3,7 @@ import type { AuthResponse, PublicAuthResponse } from "@/lib/api/contracts";
 
 const accessTokenCookie = "lifeos_access_token";
 const refreshTokenCookie = "lifeos_refresh_token";
+const sessionMaxAge = 60 * 60 * 24 * 7;
 
 const cookieOptions = {
   httpOnly: true,
@@ -21,11 +22,11 @@ export function toPublicAuthResponse(response: AuthResponse): PublicAuthResponse
 export function setSessionCookies(response: NextResponse, session: AuthResponse): void {
   response.cookies.set(accessTokenCookie, session.accessToken, {
     ...cookieOptions,
-    expires: new Date(session.expiresAt),
+    maxAge: sessionMaxAge,
   });
   response.cookies.set(refreshTokenCookie, session.refreshToken, {
     ...cookieOptions,
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: sessionMaxAge,
   });
 }
 

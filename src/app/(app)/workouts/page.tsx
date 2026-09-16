@@ -237,7 +237,10 @@ export default function WorkoutsPage() {
       };
       if (sheetEditor) await workoutsApi.updateSheet(sheetEditor.id, request);
       else await workoutsApi.createSheet(request);
-      setSheetEditor(null);
+      setSheetEditor(undefined);
+      setSheetName("");
+      setSheetMuscleGroups([]);
+      setSheetExercises([]);
       await loadWorkouts();
     } catch (saveError) {
       setError(getErrorMessage(saveError));
@@ -430,7 +433,7 @@ export default function WorkoutsPage() {
                   <h2 id="sheets-title">Começar treino</h2>
                 </div>
                 <button onClick={openCreateSheet} type="button">
-                  Gerenciar fichas
+                  Criar fichas
                 </button>
               </div>
               {sheets.length === 0 ? (

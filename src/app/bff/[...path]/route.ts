@@ -33,16 +33,25 @@ async function proxyRequest(request: NextRequest, context: RouteContext): Promis
   const cookieStore = await cookies();
   let accessToken = cookieStore.get(accessTokenCookie)?.value;
   const refreshToken = cookieStore.get(refreshTokenCookie)?.value;
-  if (!accessToken || !refreshToken) {
+  if (!refreshToken) {
     return unauthorizedResponse();
   }
 
   const requestBody = request.method === "GET" || request.method === "HEAD"
     ? undefined
     : await request.arrayBuffer();
-  let backendResponse = await forwardRequest(path.join("/"), request, accessToken, requestBody);
   let refreshed = false;
   let refreshedSession: Awaited<ReturnType<typeof refreshSession>> = null;
+  if (!accessToken) {
+    refreshedSession = await refreshSession(refreshToken);
+    if (!refreshedSession) {
+      return unauthorizedResponse();
+    }
+    accessToken = refreshedSession.accessToken;
+    refreshed = true;
+  }
+
+  let backendResponse = await forwardRequest(path.join("/"), request, accessToken, requestBody);
   if (backendResponse.status === 401) {
     refreshedSession = await refreshSession(refreshToken);
     if (!refreshedSession) {

@@ -1,6 +1,7 @@
 import { apiRequest } from "./client";
 import type {
   Badge,
+  BadgeQuery,
   BadgeRequest,
   GamificationProfile,
   Goal,
@@ -41,8 +42,8 @@ export const gamificationApi = {
     apiRequest<LevelProgressionRule>("gamification/level-progression", { signal }),
   updateLevelProgression: (request: LevelProgressionRule, signal?: AbortSignal) =>
     apiRequest<LevelProgressionRule>("gamification/level-progression", { method: "PUT", body: request, signal }),
-  getBadges: (includeArchived = false, signal?: AbortSignal) =>
-    apiRequest<Badge[]>("gamification/badges", { query: { includeArchived }, signal }),
+  getBadges: (query: BadgeQuery = {}, signal?: AbortSignal) =>
+    apiRequest<PagedResponse<Badge>>("gamification/badges", { query, signal }),
   createBadge: (request: BadgeRequest, signal?: AbortSignal) =>
     apiRequest<Badge>("gamification/badges", { method: "POST", body: request, signal }),
   updateBadge: (badgeId: Id, request: BadgeRequest, signal?: AbortSignal) =>

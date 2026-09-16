@@ -2419,7 +2419,7 @@ button:disabled {
   font-size: 0.88rem;
 }
 
-.budget-card > div > span {
+.budget-card > div:first-child > span {
   display: block;
   font-family: "Courier New", monospace;
   font-size: 0.58rem;
