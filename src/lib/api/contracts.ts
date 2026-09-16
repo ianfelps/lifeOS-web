@@ -453,6 +453,12 @@ export interface Badge extends BadgeRequest {
   unlockedAt: IsoDateTime | null;
 }
 
+export interface BadgeQuery {
+  page?: number;
+  pageSize?: number;
+  includeArchived?: boolean;
+}
+
 export interface GamificationProfile {
   totalXp: number;
   level: number;
