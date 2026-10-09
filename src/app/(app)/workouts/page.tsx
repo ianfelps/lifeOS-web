@@ -22,6 +22,8 @@ import type {
 import { usersApi } from "@/lib/api/users";
 import { workoutsApi } from "@/lib/api/workouts";
 type SetEditor = {
+  previousWeight: number | null;
+  previousWeightUnit: WeightUnit | null;
   repetitions: string;
   weight: string;
   weightUnit: WeightUnit;
@@ -1120,8 +1122,8 @@ function SessionModal({
                     <strong>{setIndex + 1}</strong>
                     <label>
                       <span>Carga</span>
-                      <input
-                        inputMode="decimal"
+                        <input
+                          inputMode="decimal"
                         onChange={(event) =>
                           updateExercise(index, {
                             ...item,
@@ -1134,8 +1136,9 @@ function SessionModal({
                                 : value,
                             ),
                           })
-                        }
-                        value={set.weight}
+                          }
+                          placeholder={getPreviousWeightPlaceholder(set)}
+                          value={set.weight}
                       />
                     </label>
                     <label>
@@ -1209,6 +1212,8 @@ function SessionModal({
                       ...item.sets,
                       {
                         repetitions: "",
+                        previousWeight: null,
+                        previousWeightUnit: null,
                         weight: "",
                         weightUnit: preferredWeightUnit,
                       },
@@ -1232,6 +1237,8 @@ function SessionModal({
                   sets: [
                     {
                       repetitions: "",
+                      previousWeight: null,
+                      previousWeightUnit: null,
                       weight: "",
                       weightUnit: preferredWeightUnit,
                     },
@@ -1422,11 +1429,20 @@ function toSessionEditor(session: WorkoutSession): SessionExerciseEditor[] {
     exerciseId: exercise.exerciseId ?? "",
     exerciseName: exercise.exerciseName,
     sets: exercise.sets.map((set) => ({
+      previousWeight: set.previousWeight,
+      previousWeightUnit: set.previousWeightUnit,
       repetitions: set.repetitions === null ? "" : String(set.repetitions),
       weight: set.weight === null ? "" : String(set.weight),
       weightUnit: set.weightUnit ?? "Kilograms",
     })),
   }));
+}
+function getPreviousWeightPlaceholder(set: SetEditor): string | undefined {
+  if (set.previousWeight === null || set.previousWeightUnit === null) {
+    return undefined;
+  }
+
+  return `${formatNumber(set.previousWeight)} ${set.previousWeightUnit === "Kilograms" ? "kg" : "lb"} no último treino`;
 }
 function toSessionRequestExercises(
   items: SessionExerciseEditor[],

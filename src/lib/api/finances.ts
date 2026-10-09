@@ -66,12 +66,24 @@ export const financesApi = {
       body: request,
       signal,
     }),
-  getMonthlySummary: (month: BusinessDate, signal?: AbortSignal) =>
-    apiRequest<MonthlySummary>("finances/reports/monthly-summary", { query: { month }, signal }),
-  getMonthlyComparison: (from: BusinessDate, to: BusinessDate, signal?: AbortSignal) =>
-    apiRequest<{ items: MonthlySummary[] }>("finances/reports/monthly-comparison", { query: { from, to }, signal }),
-  getCashFlowProjection: (from: BusinessDate, to: BusinessDate, signal?: AbortSignal) =>
-    apiRequest<{ items: MonthlySummary[] }>("finances/reports/cash-flow-projection", { query: { from, to }, signal }),
-  getCategorySpending: (month: BusinessDate, signal?: AbortSignal) =>
-    apiRequest<CategorySpending[]>("finances/reports/category-spending", { query: { month }, signal }),
+  getMonthlySummary: (month: BusinessDate, billingCycleStartDay: number, signal?: AbortSignal) =>
+    apiRequest<MonthlySummary>("finances/reports/monthly-summary", {
+      query: { month, billingCycleStartDay },
+      signal,
+    }),
+  getMonthlyComparison: (from: BusinessDate, to: BusinessDate, billingCycleStartDay: number, signal?: AbortSignal) =>
+    apiRequest<{ items: MonthlySummary[] }>("finances/reports/monthly-comparison", {
+      query: { from, to, billingCycleStartDay },
+      signal,
+    }),
+  getCashFlowProjection: (from: BusinessDate, to: BusinessDate, billingCycleStartDay: number, signal?: AbortSignal) =>
+    apiRequest<{ items: MonthlySummary[] }>("finances/reports/cash-flow-projection", {
+      query: { from, to, billingCycleStartDay },
+      signal,
+    }),
+  getCategorySpending: (month: BusinessDate, billingCycleStartDay: number, signal?: AbortSignal) =>
+    apiRequest<CategorySpending[]>("finances/reports/category-spending", {
+      query: { month, billingCycleStartDay },
+      signal,
+    }),
 };

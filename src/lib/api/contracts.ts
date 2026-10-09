@@ -102,6 +102,7 @@ export interface LoginRequest {
 
 export interface UserPreference {
   preferredWeightUnit: WeightUnit;
+  billingCycleStartDay: number;
 }
 
 export interface ChangePasswordRequest {
@@ -336,6 +337,8 @@ export interface UpdateWorkoutSessionRequest {
 export interface WorkoutSessionSet extends WorkoutSessionSetRequest {
   id: Id;
   position: number;
+  previousWeight: number | null;
+  previousWeightUnit: WeightUnit | null;
 }
 
 export interface WorkoutSessionExercise {

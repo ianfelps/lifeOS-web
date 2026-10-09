@@ -1,15 +1,7 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
-import { accessTokenCookie, refreshTokenCookie } from "@/lib/server/session";
 
-export default async function LoginPage() {
-  const cookieStore = await cookies();
-  if (cookieStore.get(accessTokenCookie)?.value && cookieStore.get(refreshTokenCookie)?.value) {
-    redirect("/dashboard");
-  }
-
+export default function LoginPage() {
   return (
     <main className="login-page">
       <Link className="login-brand" href="/" aria-label="LifeOS, início">
