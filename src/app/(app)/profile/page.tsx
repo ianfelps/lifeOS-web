@@ -203,11 +203,15 @@ export default function ProfilePage() {
   }, [badgePage, includeArchivedBadges, ledgerEvent, ledgerFrom, ledgerPage, ledgerTo]);
 
   async function updatePreference(preferredWeightUnit: UserPreference["preferredWeightUnit"]) {
+    if (!preference) return;
     setProcessing("preference");
     setError(null);
     setNotice(null);
     try {
-      const nextPreference = await usersApi.updatePreferences({ preferredWeightUnit });
+      const nextPreference = await usersApi.updatePreferences({
+        billingCycleStartDay: preference.billingCycleStartDay,
+        preferredWeightUnit,
+      });
       setPreference(nextPreference);
       setNotice("A unidade padrão de carga foi atualizada.");
     } catch (updateError) {

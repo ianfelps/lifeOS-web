@@ -32,6 +32,9 @@ export async function apiRequest<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== "undefined") {
+      window.location.replace("/login");
+    }
     throw new ApiError(response.status, await getErrorMessage(response));
   }
   if (response.status === 204) {

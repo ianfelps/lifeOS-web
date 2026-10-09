@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   CategorySpending,
   FinancialCategory,
@@ -13,6 +13,7 @@ import type {
   TransactionStatus,
 } from "@/lib/api/contracts";
 import { financesApi } from "@/lib/api/finances";
+import { usersApi } from "@/lib/api/users";
 import {
   ConfirmationModal,
   type Confirmation,
@@ -89,6 +90,9 @@ function createInstallmentEditor(date: string): InstallmentEditor {
 
 export default function FinancesPage() {
   const [month, setMonth] = useState(getCurrentMonth());
+  const hasLoadedPreference = useRef(false);
+  const [billingCycleStartDay, setBillingCycleStartDay] = useState(1);
+  const [preferredWeightUnit, setPreferredWeightUnit] = useState<"Kilograms" | "Pounds">("Kilograms");
   const [categories, setCategories] = useState<FinancialCategory[]>([]);
   const [spending, setSpending] = useState<CategorySpending[]>([]);
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
@@ -133,27 +137,29 @@ export default function FinancesPage() {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   const monthDate = `${month}-01`;
+  const cycleStart = getBillingCycleStart(month, billingCycleStartDay);
+  const cycleEnd = getBillingCycleEnd(month, billingCycleStartDay);
   const pageSize = 12;
   const pageCount = Math.max(1, Math.ceil(totalTransactions / pageSize));
 
   async function loadFinance(signal?: AbortSignal) {
     const query = {
       categoryId: filters.categoryId || undefined,
-      from: monthDate,
+      from: cycleStart,
       page,
       pageSize,
       paymentMethod: filters.paymentMethod || undefined,
       sort: filters.sort,
       status: filters.status || undefined,
-      to: getLastDayOfMonth(monthDate),
+      to: cycleEnd,
       type: filters.type || undefined,
     };
     try {
       const [nextCategories, nextSummary, nextSpending, nextTransactions] =
         await Promise.all([
           financesApi.getCategories(false, signal),
-          financesApi.getMonthlySummary(monthDate, signal),
-          financesApi.getCategorySpending(monthDate, signal),
+          financesApi.getMonthlySummary(monthDate, billingCycleStartDay, signal),
+          financesApi.getCategorySpending(monthDate, billingCycleStartDay, signal),
           financesApi.getTransactions(query, signal),
         ]);
       if (signal?.aborted) return;
@@ -174,28 +180,35 @@ export default function FinancesPage() {
     const controller = new AbortController();
     const query = {
       categoryId: filters.categoryId || undefined,
-      from: monthDate,
+      from: cycleStart,
       page,
       pageSize,
       paymentMethod: filters.paymentMethod || undefined,
       sort: filters.sort,
       status: filters.status || undefined,
-      to: getLastDayOfMonth(monthDate),
+      to: cycleEnd,
       type: filters.type || undefined,
     };
     void Promise.all([
       financesApi.getCategories(false, controller.signal),
-      financesApi.getMonthlySummary(monthDate, controller.signal),
-      financesApi.getCategorySpending(monthDate, controller.signal),
+      financesApi.getMonthlySummary(monthDate, billingCycleStartDay, controller.signal),
+      financesApi.getCategorySpending(monthDate, billingCycleStartDay, controller.signal),
       financesApi.getTransactions(query, controller.signal),
+      usersApi.getPreferences(controller.signal),
     ])
-      .then(([nextCategories, nextSummary, nextSpending, nextTransactions]) => {
+      .then(([nextCategories, nextSummary, nextSpending, nextTransactions, preference]) => {
         if (controller.signal.aborted) return;
         setCategories(nextCategories);
         setSummary(nextSummary);
         setSpending(nextSpending);
         setTransactions(nextTransactions.items);
         setTotalTransactions(nextTransactions.totalCount);
+        setPreferredWeightUnit(preference.preferredWeightUnit);
+        setBillingCycleStartDay(preference.billingCycleStartDay);
+        if (!hasLoadedPreference.current) {
+          hasLoadedPreference.current = true;
+          setMonth(getCurrentCycleMonth(preference.billingCycleStartDay));
+        }
         setError(null);
       })
       .catch((loadError: unknown) => {
@@ -205,7 +218,7 @@ export default function FinancesPage() {
         if (!controller.signal.aborted) setIsLoading(false);
       });
     return () => controller.abort();
-  }, [monthDate, page, filters]);
+  }, [monthDate, cycleStart, cycleEnd, billingCycleStartDay, page, filters]);
 
   function updateMonth(nextMonth: string) {
     setMonth(nextMonth);
@@ -543,8 +556,8 @@ export default function FinancesPage() {
     setProcessingId("reports");
     try {
       const [comparison, projection] = await Promise.all([
-        financesApi.getMonthlyComparison(from, monthDate),
-        financesApi.getCashFlowProjection(from, monthDate),
+        financesApi.getMonthlyComparison(from, monthDate, billingCycleStartDay),
+        financesApi.getCashFlowProjection(from, monthDate, billingCycleStartDay),
       ]);
       setReport({ comparison: comparison.items, projection: projection.items });
     } catch (loadError) {
@@ -591,12 +604,13 @@ export default function FinancesPage() {
         ) : null}
 
         <label className="finance-month-picker">
-          <span>MÊS EM ANÁLISE</span>
+          <span>CICLO EM ANÁLISE</span>
           <input
             onChange={(event) => updateMonth(event.target.value)}
             type="month"
             value={month}
           />
+          <small>{formatDate(cycleStart)} a {formatDate(cycleEnd)}</small>
         </label>
 
         {isLoading || !summary ? (
@@ -745,6 +759,25 @@ export default function FinancesPage() {
               className="finance-section finance-tools"
               aria-label="Configurações financeiras"
             >
+              <article>
+                <span>INÍCIO DO CICLO</span>
+                <p>Os lançamentos e relatórios consideram o período entre este dia e o anterior do mês seguinte.</p>
+                <select
+                  onChange={(event) => {
+                    const nextBillingCycleStartDay = Number(event.target.value);
+                    setBillingCycleStartDay(nextBillingCycleStartDay);
+                    void usersApi.updatePreferences({
+                      billingCycleStartDay: nextBillingCycleStartDay,
+                      preferredWeightUnit,
+                    }).catch((saveError: unknown) => setError(getErrorMessage(saveError)));
+                  }}
+                  value={billingCycleStartDay}
+                >
+                  {Array.from({ length: 28 }, (_, index) => index + 1).map((day) => (
+                    <option key={day} value={day}>Dia {day}</option>
+                  ))}
+                </select>
+              </article>
               <article>
                 <span>RECORRÊNCIAS MENSAIS</span>
                 <p>Automatize receitas e despesas que se repetem.</p>
@@ -1785,6 +1818,12 @@ function ModalActions({
 function getCurrentMonth(): string {
   return getToday().slice(0, 7);
 }
+function getCurrentCycleMonth(startDay: number): string {
+  const today = getToday();
+  const month = today.slice(0, 7);
+  if (Number(today.slice(-2)) >= startDay) return month;
+  return getMonthOffset(`${month}-01`, -1).slice(0, 7);
+}
 function getToday(): string {
   const parts = new Intl.DateTimeFormat("en-CA", {
     day: "2-digit",
@@ -1796,11 +1835,14 @@ function getToday(): string {
     parts.find((item) => item.type === type)?.value ?? "";
   return `${part("year")}-${part("month")}-${part("day")}`;
 }
-function getLastDayOfMonth(month: string): string {
-  const date = new Date(`${month}T12:00:00Z`);
-  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0))
-    .toISOString()
-    .slice(0, 10);
+function getBillingCycleStart(month: string, day: number): string {
+  return `${month}-${String(day).padStart(2, "0")}`;
+}
+function getBillingCycleEnd(month: string, day: number): string {
+  const start = new Date(`${getBillingCycleStart(month, day)}T12:00:00Z`);
+  start.setUTCMonth(start.getUTCMonth() + 1);
+  start.setUTCDate(start.getUTCDate() - 1);
+  return start.toISOString().slice(0, 10);
 }
 function getMonthOffset(month: string, offset: number): string {
   const date = new Date(`${month}T12:00:00Z`);
