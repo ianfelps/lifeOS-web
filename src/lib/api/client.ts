@@ -91,6 +91,12 @@ export function localizeApiMessage(message: string): string {
       "Agendas por dias da semana exigem ao menos um dia selecionado.",
     "Invalid credentials.": "Nome de usuário ou senha inválidos.",
     "Username and password are required.": "Informe seu nome de usuário e senha.",
+    "User name, display name, and password are required.":
+      "Informe nome de usuário, nome de exibição e senha.",
+    "Password does not meet the minimum length.":
+      "A senha não atende ao tamanho mínimo exigido.",
+    "The initial user has already been registered.":
+      "O LifeOS já possui uma conta cadastrada. Entre com suas credenciais.",
     "Budgets are only available for expense categories.":
       "Orçamentos estão disponíveis apenas para categorias de despesa.",
     "Category budget override was not found.": "A exceção mensal de orçamento não foi encontrada.",

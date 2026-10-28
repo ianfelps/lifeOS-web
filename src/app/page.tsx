@@ -136,6 +136,9 @@ export default function HomePage() {
             <span className="action-key" aria-hidden="true">A</span>
             Entrar no LifeOS
           </Link>
+          <p className="closing-register">
+            Primeiro acesso? <Link href="/register">Registre-se</Link>
+          </p>
         </div>
       </section>
 

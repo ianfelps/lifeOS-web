@@ -482,6 +482,19 @@ a {
   margin: 18px 0 28px;
 }
 
+.closing-panel > p.closing-register {
+  font-family: "Courier New", monospace;
+  font-size: 0.78rem;
+  margin: 26px 0 0;
+}
+
+.closing-register a {
+  color: white;
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
 .closing-panel .primary-action {
   background: white;
   color: var(--ink);
@@ -809,6 +822,23 @@ a {
   height: 20px;
   justify-content: center;
   width: 20px;
+}
+
+.form-hint {
+  color: #5b6168;
+  font-size: 0.72rem;
+}
+
+.login-switch {
+  font-size: 0.82rem;
+  margin: 24px 0 0;
+  text-align: center;
+}
+
+.login-switch a {
+  color: #146d9b;
+  font-weight: 700;
+  text-underline-offset: 3px;
 }
 
 .login-aside {

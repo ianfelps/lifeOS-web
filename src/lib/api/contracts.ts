@@ -100,6 +100,12 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  userName: string;
+  displayName: string;
+  password: string;
+}
+
 export interface UserPreference {
   preferredWeightUnit: WeightUnit;
   billingCycleStartDay: number;
