@@ -137,7 +137,7 @@ export default function HomePage() {
             Entrar no LifeOS
           </Link>
           <p className="closing-register">
-            Primeiro acesso? <Link href="/register">Registre-se</Link>
+            Ainda não tem conta? <Link href="/register">Registre-se</Link>
           </p>
         </div>
       </section>

@@ -20,10 +20,10 @@ export default function RegisterPage() {
           <span aria-hidden="true">00</span>
         </div>
         <div className="login-panel-content">
-          <p className="login-eyebrow">Primeiro acesso</p>
+          <p className="login-eyebrow">Nova conta</p>
           <h1 id="register-title">Comece sua jornada.</h1>
           <p className="login-description">
-            Crie a conta que vai guardar suas finanças, hábitos, treinos e metas.
+            Crie sua conta para organizar suas finanças, hábitos, treinos e metas.
           </p>
 
           <RegisterForm />
