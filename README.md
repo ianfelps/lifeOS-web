@@ -2,13 +2,13 @@
 
 Frontend do LifeOS, uma aplicação pessoal para organizar finanças, hábitos, treinos, metas e gamificação. O projeto usa Next.js como interface e BFF para proteger a sessão, concentrando os fluxos diários em uma experiência responsiva, instalável e orientada a baixo atrito.
 
-O sistema atende a um único proprietário criado pela rota de configuração inicial da API. Cadastro público, colaboração e multi-tenancy não fazem parte do escopo atual.
+O sistema atende a um único proprietário, criado pela tela `/register` no primeiro acesso. Depois da primeira conta, a API recusa novos cadastros; cadastro público permanente, colaboração e multi-tenancy não fazem parte do escopo atual.
 
 ## Módulos
 
 | Módulo | Estado | Responsabilidade principal |
 | --- | --- | --- |
-| Autenticação | Disponível | Login, encerramento de sessão e recuperação transparente de tokens. |
+| Autenticação | Disponível | Cadastro inicial, login, encerramento de sessão e recuperação transparente de tokens. |
 | Painel | Disponível | Resumo financeiro, hábitos pendentes, treinos recentes e gamificação. |
 | Hábitos | Disponível | Criação, edição, pausa, retomada, arquivamento, conclusões e correções de histórico. |
 | Finanças | Em breve | Lançamentos, categorias, orçamentos, recorrências e relatórios. |
@@ -60,6 +60,7 @@ Essa separação evita expor tokens ao JavaScript do navegador, elimina dependê
 
 | Jornada | Ação do usuário | Resultado esperado |
 | --- | --- | --- |
+| Registrar-se | Informa nome de exibição, nome de usuário e senha em `/register` | API cria a conta única; BFF inicia a sessão e redireciona ao painel. |
 | Entrar | Informa nome de usuário e senha | BFF cria cookies de sessão e redireciona ao painel. |
 | Consultar painel | Abre `/dashboard` | Carrega resumo financeiro, hábitos, treinos e gamificação. |
 | Concluir hábito | Usa a ação na lista ou no painel | API atualiza progresso, ofensiva, XP e badges derivados. |
@@ -74,7 +75,7 @@ O frontend nunca chama a API pública diretamente no navegador. Todos os cliente
 
 | Área | Cliente | Rotas internas principais |
 | --- | --- | --- |
-| Autenticação | `src/lib/api/auth.ts` | `/bff/auth/login`, `/bff/auth/logout`, `/bff/auth/me` |
+| Autenticação | `src/lib/api/auth.ts` | `/bff/auth/register`, `/bff/auth/login`, `/bff/auth/logout`, `/bff/auth/me` |
 | Painel | `src/lib/api/dashboard.ts` | `/bff/dashboard` |
 | Hábitos | `src/lib/api/habits.ts` | `/bff/habits`, conclusões, progresso e histórico |
 | Finanças | `src/lib/api/finances.ts` | `/bff/finances/**` |

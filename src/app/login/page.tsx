@@ -22,6 +22,10 @@ export default function LoginPage() {
           </p>
 
           <LoginForm />
+
+          <p className="login-switch">
+            Primeiro acesso? <Link href="/register">Registre-se</Link>
+          </p>
         </div>
       </section>
 
