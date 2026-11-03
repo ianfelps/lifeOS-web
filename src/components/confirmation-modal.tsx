@@ -6,6 +6,10 @@ export type Confirmation = {
   confirmLabel: string;
   description: string;
   onConfirm: () => Promise<void>;
+  secondaryAction?: {
+    label: string;
+    onConfirm: () => Promise<void>;
+  };
   title: string;
 };
 
@@ -13,17 +17,25 @@ export function ConfirmationModal({
   confirmation,
   onCancel,
 }: Readonly<{ confirmation: Confirmation; onCancel: () => void }>) {
-  const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmingAction, setConfirmingAction] = useState<
+    "primary" | "secondary" | null
+  >(null);
+  const isConfirming = confirmingAction !== null;
 
-  async function confirm() {
-    setIsConfirming(true);
+  async function confirm(
+    action: "primary" | "secondary",
+    handler: () => Promise<void>,
+  ) {
+    setConfirmingAction(action);
     try {
-      await confirmation.onConfirm();
+      await handler();
       onCancel();
     } finally {
-      setIsConfirming(false);
+      setConfirmingAction(null);
     }
   }
+
+  const { secondaryAction } = confirmation;
 
   return (
     <div className="confirmation-modal-backdrop" role="presentation">
@@ -52,13 +64,29 @@ export function ConfirmationModal({
             <button disabled={isConfirming} onClick={onCancel} type="button">
               Voltar
             </button>
+            {secondaryAction ? (
+              <button
+                className="danger"
+                disabled={isConfirming}
+                onClick={() =>
+                  void confirm("secondary", secondaryAction.onConfirm)
+                }
+                type="button"
+              >
+                {confirmingAction === "secondary"
+                  ? "Confirmando..."
+                  : secondaryAction.label}
+              </button>
+            ) : null}
             <button
               className="danger"
               disabled={isConfirming}
-              onClick={() => void confirm()}
+              onClick={() => void confirm("primary", confirmation.onConfirm)}
               type="button"
             >
-              {isConfirming ? "Confirmando..." : confirmation.confirmLabel}
+              {confirmingAction === "primary"
+                ? "Confirmando..."
+                : confirmation.confirmLabel}
             </button>
           </div>
         </div>

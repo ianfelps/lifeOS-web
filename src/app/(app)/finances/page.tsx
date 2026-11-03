@@ -312,6 +312,42 @@ export default function FinancesPage() {
     }
   }
 
+  async function deleteInstallmentPurchase(purchaseId: string) {
+    setProcessingId(purchaseId);
+    try {
+      await financesApi.deleteInstallmentPurchase(purchaseId);
+      await loadFinance();
+    } catch (deleteError) {
+      setError(getErrorMessage(deleteError));
+    } finally {
+      setProcessingId(null);
+    }
+  }
+
+  function requestTransactionDeletion(item: Transaction) {
+    const label = item.description || "sem descrição";
+    const purchaseId = item.installmentPurchaseId;
+    if (!purchaseId) {
+      setConfirmation({
+        confirmLabel: "Excluir lançamento",
+        description: `O lançamento “${label}” será removido.`,
+        onConfirm: () => deleteTransaction(item),
+        title: "Excluir lançamento?",
+      });
+      return;
+    }
+    setConfirmation({
+      confirmLabel: "Excluir compra inteira",
+      description: `Escolha se deseja remover apenas a ${item.installmentNumber ?? ""}ª parcela de “${label}” ou a compra parcelada inteira, com todas as parcelas.`,
+      onConfirm: () => deleteInstallmentPurchase(purchaseId),
+      secondaryAction: {
+        label: "Excluir só esta parcela",
+        onConfirm: () => deleteTransaction(item),
+      },
+      title: "Excluir parcela?",
+    });
+  }
+
   async function saveCategory() {
     if (!categoryEditor) return;
     const name = categoryEditor.name.trim();
@@ -669,14 +705,7 @@ export default function FinancesPage() {
               <TransactionList
                 categories={categories}
                 onConfirm={(item) => void confirmTransaction(item)}
-                onDelete={(item) =>
-                  setConfirmation({
-                    confirmLabel: "Excluir lançamento",
-                    description: `O lançamento “${item.description || "sem descrição"}” será removido.`,
-                    onConfirm: () => deleteTransaction(item),
-                    title: "Excluir lançamento?",
-                  })
-                }
+                onDelete={requestTransactionDeletion}
                 onEdit={openTransactionEditor}
                 processingId={processingId}
                 transactions={transactions}
@@ -1050,16 +1079,18 @@ function TransactionList({
             >
               Editar
             </button>
-            {!item.installmentPurchaseId ? (
-              <button
-                className="danger"
-                disabled={processingId === item.id}
-                onClick={() => onDelete(item)}
-                type="button"
-              >
-                Excluir
-              </button>
-            ) : null}
+            <button
+              className="danger"
+              disabled={
+                processingId === item.id ||
+                (!!item.installmentPurchaseId &&
+                  processingId === item.installmentPurchaseId)
+              }
+              onClick={() => onDelete(item)}
+              type="button"
+            >
+              Excluir
+            </button>
           </div>
         </article>
       ))}

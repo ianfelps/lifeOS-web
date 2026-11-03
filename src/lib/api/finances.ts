@@ -60,6 +60,8 @@ export const financesApi = {
     apiRequest<InstallmentPurchase>("finances/installment-purchases", { method: "POST", body: request, signal }),
   getInstallmentPurchase: (purchaseId: Id, signal?: AbortSignal) =>
     apiRequest<InstallmentPurchase>(`finances/installment-purchases/${purchaseId}`, { signal }),
+  deleteInstallmentPurchase: (purchaseId: Id, signal?: AbortSignal) =>
+    apiRequest<void>(`finances/installment-purchases/${purchaseId}`, { method: "DELETE", signal }),
   updateInstallmentPurchase: (purchaseId: Id, request: InstallmentPurchaseRequest, signal?: AbortSignal) =>
     apiRequest<InstallmentPurchase>(`finances/installment-purchases/${purchaseId}`, {
       method: "PUT",
